@@ -1,0 +1,2117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SECOP II Intelligence - Connect Your Knowledge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0066cc;
+            --primary-dark: #004499;
+            --secondary: #00b4d8;
+            --success: #06d6a0;
+            --warning: #ffd60a;
+            --danger: #ef476f;
+            --dark: #2d3436;
+            --light: #f8f9fa;
+            --border: #e0e0e0;
+            --shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 8px 24px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f5f5;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        /* ========== LAYOUT ========== */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 15px;
+        }
+
+        .app-wrapper {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: var(--shadow-lg);
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100vh;
+            width: 250px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+        .sidebar-header {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .sidebar-logo {
+            font-size: 18px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-logo span {
+            font-size: 24px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: var(--secondary);
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .user-info {
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .btn-logout {
+            width: 100%;
+            padding: 10px;
+            background-color: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            background-color: var(--danger);
+            border-color: var(--danger);
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            margin-left: 250px;
+            padding: 30px;
+            background-color: #f5f5f5;
+        }
+
+        /* ========== HEADER ========== */
+        .page-header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-header h1 {
+            font-size: 28px;
+            color: var(--dark);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* ========== CARDS ========== */
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-header h2 {
+            font-size: 20px;
+            color: var(--primary);
+        }
+
+        /* ========== GRID LAYOUT ========== */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        /* ========== DASHBOARD WIDGETS ========== */
+        .metric-widget {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            border-top: 4px solid var(--primary);
+        }
+
+        .metric-widget.warning {
+            border-top-color: var(--warning);
+        }
+
+        .metric-widget.success {
+            border-top-color: var(--success);
+        }
+
+        .metric-widget.danger {
+            border-top-color: var(--danger);
+        }
+
+        .metric-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary);
+            margin: 10px 0;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* ========== FORMS ========== */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="password"]:focus,
+        input[type="number"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+        }
+
+        /* ========== BUTTONS ========== */
+        button, .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #0099b8;
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: var(--dark);
+        }
+
+        .btn-success:hover {
+            background-color: #05b587;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #d63a5f;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .btn-block {
+            width: 100%;
+            justify-content: center;
+        }
+
+        /* ========== TABLES ========== */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .table thead {
+            background-color: var(--light);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tbody tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        /* ========== BADGES ========== */
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-primary {
+            background-color: rgba(0, 102, 204, 0.1);
+            color: var(--primary);
+        }
+
+        .badge-success {
+            background-color: rgba(6, 214, 160, 0.1);
+            color: var(--success);
+        }
+
+        .badge-danger {
+            background-color: rgba(239, 71, 111, 0.1);
+            color: var(--danger);
+        }
+
+        .badge-warning {
+            background-color: rgba(255, 214, 10, 0.1);
+            color: #cc9900;
+        }
+
+        /* ========== MODALS ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            animation: slideUp 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--primary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close-btn:hover {
+            color: var(--dark);
+        }
+
+        /* ========== ANIMATIONS ========== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        /* ========== ALERTS ========== */
+        .alert {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-info {
+            background-color: rgba(0, 102, 204, 0.1);
+            color: var(--primary);
+            border-left: 4px solid var(--primary);
+        }
+
+        .alert-success {
+            background-color: rgba(6, 214, 160, 0.1);
+            color: var(--success);
+            border-left: 4px solid var(--success);
+        }
+
+        .alert-danger {
+            background-color: rgba(239, 71, 111, 0.1);
+            color: var(--danger);
+            border-left: 4px solid var(--danger);
+        }
+
+        /* ========== TABS ========== */
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 20px;
+            gap: 0;
+        }
+
+        .tab {
+            padding: 12px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            color: #666;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .tab:hover {
+            color: var(--primary);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 1024px) {
+            .app-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .grid-2, .grid-3, .grid-4 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .header-actions {
+                width: 100%;
+            }
+
+            .modal-content {
+                width: 95%;
+            }
+        }
+
+        /* ========== HIDDEN ========== */
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-20 {
+            margin-top: 20px;
+        }
+
+        /* ========== LOGIN PAGE ========== */
+        .login-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .login-card h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .login-card .subtitle {
+            color: #666;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN PAGE -->
+    <div id="loginPage" class="login-page">
+        <div class="login-card">
+            <h1>🔍 SECOP Intelligence</h1>
+            <p class="subtitle">Connect Your Knowledge</p>
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="email" id="loginEmail" placeholder="correo@ejemplo.com" value="catalina.ropero@gmail.com">
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" id="loginPassword" placeholder="Contraseña">
+            </div>
+            <button class="btn btn-primary btn-block" onclick="handleLogin()">Ingresar</button>
+        </div>
+    </div>
+
+    <!-- APP PAGE -->
+    <div id="appPage" class="hidden">
+        <div class="app-wrapper">
+            <!-- SIDEBAR -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-logo">
+                        <span>🔍</span>
+                        <div>SECOP II<br><small style="font-size: 11px;">Intelligence</small></div>
+                    </div>
+                </div>
+
+                <ul class="sidebar-nav">
+                    <li><a class="nav-link active" data-page="dashboard" onclick="switchPage('dashboard')">📊 Dashboard</a></li>
+                    <li><a class="nav-link" data-page="buscar" onclick="switchPage('buscar')">🔎 Búsqueda Manual</a></li>
+                    <li><a class="nav-link" data-page="oportunidades" onclick="switchPage('oportunidades')">📋 Oportunidades</a></li>
+                    <li><a class="nav-link" data-page="palabras-clave" onclick="switchPage('palabras-clave')">🏷️ Palabras Clave</a></li>
+                    <li><a class="nav-link" data-page="monitoreo" onclick="switchPage('monitoreo')">⏰ Monitoreo</a></li>
+                    <li><a class="nav-link" data-page="historial" onclick="switchPage('historial')">📜 Historial</a></li>
+                    <li><a class="nav-link" data-page="configuracion" onclick="switchPage('configuracion')">⚙️ Configuración</a></li>
+                </ul>
+
+                <div class="sidebar-footer">
+                    <div class="user-info">
+                        <strong id="userEmail">usuario@ejemplo.com</strong><br>
+                        <small>Administrador</small>
+                    </div>
+                    <button class="btn-logout" onclick="handleLogout()">Cerrar Sesión</button>
+                </div>
+            </aside>
+
+            <!-- MAIN CONTENT -->
+            <main class="main-content">
+                <!-- DASHBOARD PAGE -->
+                <div id="dashboardPage" class="page-content">
+                    <div class="page-header">
+                        <div>
+                            <h1>📊 Dashboard</h1>
+                        </div>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="executeSearch()">🚀 Ejecutar Búsqueda</button>
+                        </div>
+                    </div>
+
+                    <div class="grid-4">
+                        <div class="metric-widget">
+                            <div class="metric-label">Convocatorias Encontradas</div>
+                            <div class="metric-value" id="totalConvocatorias">0</div>
+                        </div>
+                        <div class="metric-widget success">
+                            <div class="metric-label">Procesos Relevantes</div>
+                            <div class="metric-value" id="procesosRelevantes">0</div>
+                        </div>
+                        <div class="metric-widget warning">
+                            <div class="metric-label">Procesos Próximos a Vencer</div>
+                            <div class="metric-value" id="proximosVencer">0</div>
+                        </div>
+                        <div class="metric-widget danger">
+                            <div class="metric-label">Procesos Descartados</div>
+                            <div class="metric-value" id="procesosDescartados">0</div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2" style="margin-top: 30px;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Presupuesto Total Identificado</h2>
+                            </div>
+                            <div style="font-size: 32px; font-weight: bold; color: var(--success); text-align: center;">
+                                <span id="presupuestoTotal">$0</span>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>Afinidad Promedio</h2>
+                            </div>
+                            <div style="font-size: 32px; font-weight: bold; color: var(--primary); text-align: center;">
+                                <span id="afinidadPromedio">0%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-top: 30px;">
+                        <div class="card-header">
+                            <h2>Procesos Próximos a Vencer (7 días)</h2>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Número Proceso</th>
+                                    <th>Entidad</th>
+                                    <th>Presupuesto</th>
+                                    <th>Cierre</th>
+                                    <th>Afinidad</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablaProcesosVencer">
+                                <tr>
+                                    <td colspan="5" class="text-center">Sin procesos próximos a vencer</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="card" style="margin-top: 30px;">
+                        <div class="card-header">
+                            <h2>Últimas 5 Oportunidades</h2>
+                        </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Número Proceso</th>
+                                    <th>Entidad</th>
+                                    <th>Objeto</th>
+                                    <th>Afinidad</th>
+                                    <th>Estado</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablasUltimas5">
+                                <tr>
+                                    <td colspan="5" class="text-center">Sin oportunidades registradas</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- BUSCAR PAGE -->
+                <div id="buscarPage" class="page-content hidden">
+                    <div class="page-header">
+                        <h1>🔎 Búsqueda Manual</h1>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Filtros de Búsqueda</h2>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Palabra Clave</label>
+                                <input type="text" id="palabraClaveManual" placeholder="ej: cursos virtuales">
+                            </div>
+                            <div class="form-group">
+                                <label>Presupuesto Mínimo (COP)</label>
+                                <input type="number" id="presupuestoMinManual" value="100000000">
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Presupuesto Máximo (COP)</label>
+                                <input type="number" id="presupuestoMaxManual" value="3000000000">
+                            </div>
+                            <div class="form-group">
+                                <label>Afinidad Mínima (%)</label>
+                                <input type="number" id="afinidadMinManual" value="70" min="0" max="100">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Fecha de Publicación Desde</label>
+                            <input type="date" id="fechaPublicacionDesde">
+                        </div>
+
+                        <button class="btn btn-primary btn-block mt-20" onclick="busquedaManualModificada()">🔍 Buscar Ahora</button>
+                    </div>
+
+                    <div id="resultadosBusqueda" class="card hidden" style="margin-top: 30px;">
+                        <div class="card-header">
+                            <h2>Resultados de Búsqueda</h2>
+                        </div>
+                        <div id="contenidoResultados"></div>
+                    </div>
+                </div>
+
+                <!-- OPORTUNIDADES PAGE -->
+                <div id="oportunidadesPage" class="page-content hidden">
+                    <div class="page-header">
+                        <h1>📋 Oportunidades</h1>
+                        <div class="header-actions">
+                            <button class="btn btn-secondary" onclick="openModalOportunidad()">+ Nueva</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Gestión de Oportunidades</h2>
+                            <div style="display: flex; gap: 10px;">
+                                <select id="filtroEstado" onchange="filtrarOportunidades()" style="padding: 8px 12px; border: 1px solid var(--border); border-radius: 4px;">
+                                    <option value="">Todos los estados</option>
+                                    <option value="Nueva">Nueva</option>
+                                    <option value="En revisión">En revisión</option>
+                                    <option value="Interesante">Interesante</option>
+                                    <option value="Decidimos participar">Decidimos participar</option>
+                                    <option value="Oferta presentada">Oferta presentada</option>
+                                    <option value="No aplica">No aplica</option>
+                                    <option value="Ganada">Ganada</option>
+                                    <option value="Perdida">Perdida</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="listaOportunidades"></div>
+                    </div>
+                </div>
+
+                <!-- PALABRAS CLAVE PAGE -->
+                <div id="palabrasClavePageContent" class="page-content hidden">
+                    <div class="page-header">
+                        <h1>🏷️ Palabras Clave</h1>
+                        <div class="header-actions">
+                            <button class="btn btn-primary" onclick="openModalPalabraClave()">+ Agregar</button>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Gestión de Palabras Clave para Búsqueda</h2>
+                        </div>
+
+                        <div id="listaPalabrasClaveUI"></div>
+                    </div>
+                </div>
+
+                <!-- MONITOREO PAGE -->
+                <div id="monitoreoPage" class="page-content hidden">
+                    <div class="page-header">
+                        <h1>⏰ Monitoreo</h1>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Procesos en Seguimiento</h2>
+                        </div>
+
+                        <div id="listaMonitoreo"></div>
+                    </div>
+                </div>
+
+                <!-- HISTORIAL PAGE -->
+                <div id="historialPage" class="page-content hidden">
+                    <div class="page-header">
+                        <h1>📜 Historial</h1>
+                    </div>
+
+                    <div class="card">
+                        <div class="tabs">
+                            <div class="tab active" onclick="switchTab(this, 'historialBusquedas')">Búsquedas</div>
+                            <div class="tab" onclick="switchTab(this, 'historialCambios')">Cambios en Procesos</div>
+                        </div>
+
+                        <div id="historialBusquedas" class="tab-content active">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Palabra Clave</th>
+                                        <th>Resultados</th>
+                                        <th>Relevantes</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaHistorialBusquedas">
+                                    <tr>
+                                        <td colspan="4" class="text-center">Sin historial de búsquedas</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div id="historialCambios" class="tab-content hidden">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Proceso</th>
+                                        <th>Tipo de Cambio</th>
+                                        <th>Descripción</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tablaHistorialCambios">
+                                    <tr>
+                                        <td colspan="4" class="text-center">Sin cambios detectados</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONFIGURACION PAGE -->
+                <div id="configuracionPage" class="page-content hidden">
+                    <div class="page-header">
+                        <h1>⚙️ Configuración</h1>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>Configuración General</h2>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Presupuesto Mínimo Global (COP)</label>
+                            <input type="number" id="configPresupuestoMin" value="100000000">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Presupuesto Máximo Global (COP)</label>
+                            <input type="number" id="configPresupuestoMax" value="3000000000">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Afinidad Mínima para Considerar (%)</label>
+                            <input type="number" id="configAfinidadMin" value="70" min="0" max="100">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Frecuencia de Búsqueda Automática</label>
+                            <select id="configFrecuencia">
+                                <option value="4">Cada 4 horas</option>
+                                <option value="8">Cada 8 horas</option>
+                                <option value="24">Cada 24 horas</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Horario de Notificaciones Diarias</label>
+                            <input type="time" id="configHoraNotificacion" value="12:00">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Correo para Notificaciones</label>
+                            <input type="email" id="configCorreoNotificacion" placeholder="notificaciones@empresa.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="configNotificacionesActivas" checked>
+                                Activar notificaciones automáticas
+                            </label>
+                        </div>
+
+                        <button class="btn btn-primary btn-block mt-20" onclick="guardarConfiguracion()">💾 Guardar Configuración</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <!-- Modal Oportunidad -->
+    <div id="modalOportunidad" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Oportunidad</h2>
+                <button class="close-btn" onclick="closeModal('modalOportunidad')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Número de Proceso</label>
+                <input type="text" id="oportunidadNumero">
+            </div>
+            <div class="form-group">
+                <label>Entidad</label>
+                <input type="text" id="oportunidadEntidad">
+            </div>
+            <div class="form-group">
+                <label>Objeto</label>
+                <textarea id="oportunidadObjeto" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Presupuesto (COP)</label>
+                <input type="number" id="oportunidadPresupuesto">
+            </div>
+            <div class="form-group">
+                <label>Afinidad (%)</label>
+                <input type="number" id="oportunidadAfinidad" min="0" max="100">
+            </div>
+            <div class="form-group">
+                <label>Estado</label>
+                <select id="oportunidadEstado">
+                    <option value="Nueva">Nueva</option>
+                    <option value="En revisión">En revisión</option>
+                    <option value="Interesante">Interesante</option>
+                    <option value="Decidimos participar">Decidimos participar</option>
+                    <option value="Oferta presentada">Oferta presentada</option>
+                    <option value="No aplica">No aplica</option>
+                    <option value="Ganada">Ganada</option>
+                    <option value="Perdida">Perdida</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Fecha de Cierre</label>
+                <input type="date" id="oportunidadFechaCierre">
+            </div>
+            <button class="btn btn-primary btn-block mt-20" onclick="guardarOportunidad()">Guardar</button>
+        </div>
+    </div>
+
+    <!-- Modal Palabra Clave -->
+    <div id="modalPalabraClave" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Palabra Clave</h2>
+                <button class="close-btn" onclick="closeModal('modalPalabraClave')">&times;</button>
+            </div>
+            <div class="form-group">
+                <label>Palabra Clave</label>
+                <input type="text" id="palabraClaveInput" placeholder="ej: cursos virtuales">
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="palabraClaveActiva" checked>
+                    Activa
+                </label>
+            </div>
+            <button class="btn btn-primary btn-block mt-20" onclick="guardarPalabraClave()">Guardar</button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // ========== LOCAL STORAGE & STATE ==========
+        const appState = {
+            user: null,
+            oportunidades: [],
+            palabrasClaves: [],
+            historialBusquedas: [],
+            historialCambios: [],
+            monitoreo: [],
+            config: {
+                presupuestoMin: 100000000,
+                presupuestoMax: 3000000000,
+                afinidadMin: 70,
+                frecuencia: 4,
+                horaNotificacion: '12:00',
+                correoNotificacion: '',
+                notificacionesActivas: true
+            }
+        };
+
+        // ========== INITIALIZATION ==========
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFromStorage();
+            setDefaultDate();
+        });
+
+        function setDefaultDate() {
+            const today = new Date();
+            const yesterday = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+            document.getElementById('fechaPublicacionDesde').valueAsDate = yesterday;
+        }
+
+        // ========== LOCAL STORAGE ==========
+        function loadFromStorage() {
+            const stored = localStorage.getItem('secopIntelligenceApp');
+            if (stored) {
+                const data = JSON.parse(stored);
+                appState.oportunidades = data.oportunidades || [];
+                appState.palabrasClaves = data.palabrasClaves || [];
+                appState.historialBusquedas = data.historialBusquedas || [];
+                appState.historialCambios = data.historialCambios || [];
+                appState.monitoreo = data.monitoreo || [];
+                appState.config = { ...appState.config, ...data.config };
+            }
+            loadPalabrasClaveIniciales();
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('secopIntelligenceApp', JSON.stringify({
+                oportunidades: appState.oportunidades,
+                palabrasClaves: appState.palabrasClaves,
+                historialBusquedas: appState.historialBusquedas,
+                historialCambios: appState.historialCambios,
+                monitoreo: appState.monitoreo,
+                config: appState.config
+            }));
+        }
+
+        // ========== PALABRAS CLAVE INICIALES ==========
+        function loadPalabrasClaveIniciales() {
+            const palabrasIniciales = [
+                'interactivo', 'interactividad', 'cursos virtuales', 'gamificación', 'aprendizaje',
+                'cursos online', 'bases de datos', 'contenidos virtuales', 'productos virtuales',
+                'productos de aprendizaje', 'espacios virtuales', 'espacios digitales',
+                'plataformas de aprendizaje', 'plataformas LMS', 'plataforma e-learning',
+                'plataforma virtual', 'plataforma web', 'recursos de aprendizaje',
+                'interoperabilidad', 'integración de sistemas', 'analítica de datos',
+                'métricas', 'virtualización', 'formación virtual', 'plataforma educativa',
+                'RECURSOS VIRTUALES', 'diseño instruccional - competencias',
+                'tecnologías de la información y las comunicaciones', 'realidad aumentada',
+                'realidad virtual y la visión en 360°', 'mooc', 'microlearning',
+                'Desarrollo a la medida', 'desarrollo de software', 'multiplataforma',
+                'integración de servicios', 'integración de software', 'capacitación',
+                'taller online', 'taller virtual', 'diplomado virtual', 'diplomado online',
+                'optimización', 'Aulas Dinámicas',
+                'implementación de tecnologías de ambientes integrados para la gestión de aprendizaje',
+                'Adquisición de herramientas tecnológicas', 'educacion digital',
+                'servicio de plataforma', 'servicio de infraestructura tecnológica',
+                'servicio de analítica de datos', 'Inteligencia Artificial',
+                'LEARNING MANAGEMENT SYSTEM (LMS)', 'MODALIDAD A DISTANCIA',
+                'ADAPTACIÓN DE CONTENIDOS PROGRAMÁTICOS A LA MODALIDAD VIRTUAL',
+                'Automatizar', 'Automatización', 'indicadores', 'OVAS', 'Virtuales',
+                'SAAS', 'POWER BI', 'SERVICIOS DE FABRICACIÓN', 'Software'
+            ];
+
+            if (appState.palabrasClaves.length === 0) {
+                appState.palabrasClaves = palabrasIniciales.map(p => ({
+                    id: Date.now() + Math.random(),
+                    palabra: p,
+                    activa: true,
+                    fechaAgregada: new Date().toISOString()
+                }));
+                saveToStorage();
+            }
+        }
+
+        // ========== AUTHENTICATION ==========
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                alert('Por favor completa todos los campos');
+                return;
+            }
+
+            appState.user = {
+                email: email,
+                fechaLogin: new Date().toISOString()
+            };
+
+            document.getElementById('userEmail').textContent = email;
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('appPage').classList.remove('hidden');
+
+            loadConfiguracion();
+            actualizarDashboard();
+            renderOportunidades();
+            renderPalabrasClaveUI();
+        }
+
+        function handleLogout() {
+            if (confirm('¿Deseas cerrar sesión?')) {
+                appState.user = null;
+                document.getElementById('loginPage').classList.remove('hidden');
+                document.getElementById('appPage').classList.add('hidden');
+                document.getElementById('loginEmail').value = '';
+                document.getElementById('loginPassword').value = '';
+            }
+        }
+
+        // ========== NAVIGATION ==========
+        function switchPage(page) {
+            document.querySelectorAll('.page-content').forEach(p => p.classList.add('hidden'));
+            document.getElementById(page + 'Page') && document.getElementById(page + 'Page').classList.remove('hidden');
+
+            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+            document.querySelector(`[data-page="${page}"]`).classList.add('active');
+
+            if (page === 'oportunidades') {
+                renderOportunidades();
+            } else if (page === 'palabras-clave') {
+                renderPalabrasClaveUI();
+            } else if (page === 'monitoreo') {
+                renderMonitoreo();
+            } else if (page === 'historial') {
+                renderHistorial();
+            } else if (page === 'dashboard') {
+                actualizarDashboard();
+            }
+        }
+
+        function switchTab(tabElement, tabContent) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+
+            tabElement.classList.add('active');
+            document.getElementById(tabContent).classList.remove('hidden');
+        }
+
+        // ========== DASHBOARD ==========
+        function actualizarDashboard() {
+            const oportunidades = appState.oportunidades;
+
+            document.getElementById('totalConvocatorias').textContent = oportunidades.length;
+            document.getElementById('procesosRelevantes').textContent = oportunidades.filter(o => o.afinidad >= appState.config.afinidadMin).length;
+
+            const ahora = new Date();
+            const dentro7dias = new Date(ahora.getTime() + 7 * 24 * 60 * 60 * 1000);
+            const proximosVencer = oportunidades.filter(o => {
+                const fecha = new Date(o.fechaCierre);
+                return fecha > ahora && fecha <= dentro7dias;
+            });
+            document.getElementById('proximosVencer').textContent = proximosVencer.length;
+
+            document.getElementById('procesosDescartados').textContent = oportunidades.filter(o => o.estado === 'No aplica').length;
+
+            const presupuestoTotal = oportunidades.reduce((sum, o) => sum + (o.presupuesto || 0), 0);
+            document.getElementById('presupuestoTotal').textContent = formatCurrency(presupuestoTotal);
+
+            const afinidadPromedio = oportunidades.length > 0
+                ? Math.round(oportunidades.reduce((sum, o) => sum + (o.afinidad || 0), 0) / oportunidades.length)
+                : 0;
+            document.getElementById('afinidadPromedio').textContent = afinidadPromedio + '%';
+
+            renderProcesosVencer(proximosVencer);
+            renderUltimas5(oportunidades.slice(-5).reverse());
+        }
+
+        function renderProcesosVencer(procesos) {
+            const tbody = document.getElementById('tablaProcesosVencer');
+            if (procesos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">Sin procesos próximos a vencer</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = procesos.map(p => `
+                <tr>
+                    <td><strong>${p.numero}</strong></td>
+                    <td>${p.entidad}</td>
+                    <td>${formatCurrency(p.presupuesto)}</td>
+                    <td>${p.fechaCierre}</td>
+                    <td><span class="badge badge-primary">${p.afinidad}%</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderUltimas5(procesos) {
+            const tbody = document.getElementById('tablasUltimas5');
+            if (procesos.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">Sin oportunidades registradas</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = procesos.map(p => `
+                <tr>
+                    <td><strong>${p.numero}</strong></td>
+                    <td>${p.entidad}</td>
+                    <td>${p.objeto.substring(0, 50)}...</td>
+                    <td><span class="badge badge-primary">${p.afinidad}%</span></td>
+                    <td><span class="badge ${getEstadoBadgeClass(p.estado)}">${p.estado}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function getEstadoBadgeClass(estado) {
+            const states = {
+                'Nueva': 'badge-primary',
+                'En revisión': 'badge-warning',
+                'Interesante': 'badge-primary',
+                'Decidimos participar': 'badge-success',
+                'Oferta presentada': 'badge-success',
+                'Ganada': 'badge-success',
+                'Perdida': 'badge-danger',
+                'No aplica': 'badge-danger'
+            };
+            return states[estado] || 'badge-primary';
+        }
+
+        // ========== OPORTUNIDADES ==========
+        function renderOportunidades() {
+            const container = document.getElementById('listaOportunidades');
+            const estadoFiltro = document.getElementById('filtroEstado').value;
+
+            let oportunidades = appState.oportunidades;
+            if (estadoFiltro) {
+                oportunidades = oportunidades.filter(o => o.estado === estadoFiltro);
+            }
+
+            if (oportunidades.length === 0) {
+                container.innerHTML = '<p class="text-center" style="padding: 20px;">Sin oportunidades registradas</p>';
+                return;
+            }
+
+            container.innerHTML = oportunidades.map(o => `
+                <div style="border: 1px solid var(--border); border-radius: 6px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: start;">
+                    <div style="flex: 1;">
+                        <h3 style="color: var(--primary); margin-bottom: 5px;">${o.numero}</h3>
+                        <p><strong>Entidad:</strong> ${o.entidad}</p>
+                        <p><strong>Objeto:</strong> ${o.objeto}</p>
+                        <p><strong>Presupuesto:</strong> ${formatCurrency(o.presupuesto)}</p>
+                        <p><strong>Afinidad:</strong> <span class="badge badge-primary">${o.afinidad}%</span></p>
+                        <p><strong>Estado:</strong> <span class="badge ${getEstadoBadgeClass(o.estado)}">${o.estado}</span></p>
+                        <p><strong>Cierre:</strong> ${o.fechaCierre}</p>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <button class="btn btn-secondary btn-small" onclick="editarOportunidad('${o.id}')">Editar</button>
+                        <button class="btn btn-danger btn-small" onclick="eliminarOportunidad('${o.id}')">Eliminar</button>
+                        ${o.estado === 'Decidimos participar' ? `<button class="btn btn-success btn-small" onclick="marcarComoSeguimiento('${o.id}')">En Seguimiento</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function openModalOportunidad(id = null) {
+            const modal = document.getElementById('modalOportunidad');
+            if (id) {
+                const oportunidad = appState.oportunidades.find(o => o.id === id);
+                if (oportunidad) {
+                    document.getElementById('oportunidadNumero').value = oportunidad.numero;
+                    document.getElementById('oportunidadEntidad').value = oportunidad.entidad;
+                    document.getElementById('oportunidadObjeto').value = oportunidad.objeto;
+                    document.getElementById('oportunidadPresupuesto').value = oportunidad.presupuesto;
+                    document.getElementById('oportunidadAfinidad').value = oportunidad.afinidad;
+                    document.getElementById('oportunidadEstado').value = oportunidad.estado;
+                    document.getElementById('oportunidadFechaCierre').value = oportunidad.fechaCierre;
+                    modal.dataset.id = id;
+                }
+            } else {
+                document.getElementById('oportunidadNumero').value = '';
+                document.getElementById('oportunidadEntidad').value = '';
+                document.getElementById('oportunidadObjeto').value = '';
+                document.getElementById('oportunidadPresupuesto').value = '';
+                document.getElementById('oportunidadAfinidad').value = '';
+                document.getElementById('oportunidadEstado').value = 'Nueva';
+                document.getElementById('oportunidadFechaCierre').value = '';
+                delete modal.dataset.id;
+            }
+            modal.classList.add('active');
+        }
+
+        function guardarOportunidad() {
+            const id = document.getElementById('modalOportunidad').dataset.id;
+            const oportunidad = {
+                id: id || Date.now().toString(),
+                numero: document.getElementById('oportunidadNumero').value,
+                entidad: document.getElementById('oportunidadEntidad').value,
+                objeto: document.getElementById('oportunidadObjeto').value,
+                presupuesto: parseInt(document.getElementById('oportunidadPresupuesto').value) || 0,
+                afinidad: parseInt(document.getElementById('oportunidadAfinidad').value) || 0,
+                estado: document.getElementById('oportunidadEstado').value,
+                fechaCierre: document.getElementById('oportunidadFechaCierre').value,
+                fechaRegistro: new Date().toISOString()
+            };
+
+            if (id) {
+                const idx = appState.oportunidades.findIndex(o => o.id === id);
+                if (idx !== -1) appState.oportunidades[idx] = oportunidad;
+            } else {
+                appState.oportunidades.push(oportunidad);
+            }
+
+            saveToStorage();
+            closeModal('modalOportunidad');
+            renderOportunidades();
+            actualizarDashboard();
+        }
+
+        function editarOportunidad(id) {
+            openModalOportunidad(id);
+        }
+
+        function eliminarOportunidad(id) {
+            if (confirm('¿Eliminar esta oportunidad?')) {
+                appState.oportunidades = appState.oportunidades.filter(o => o.id !== id);
+                saveToStorage();
+                renderOportunidades();
+                actualizarDashboard();
+            }
+        }
+
+        function filtrarOportunidades() {
+            renderOportunidades();
+        }
+
+        function marcarComoSeguimiento(id) {
+            const oportunidad = appState.oportunidades.find(o => o.id === id);
+            if (oportunidad) {
+                appState.monitoreo.push({
+                    id: oportunidad.id,
+                    numero: oportunidad.numero,
+                    entidad: oportunidad.entidad,
+                    objeto: oportunidad.objeto,
+                    presupuesto: oportunidad.presupuesto,
+                    afinidad: oportunidad.afinidad,
+                    estado: oportunidad.estado,
+                    fechaCierre: oportunidad.fechaCierre,
+                    fechaInicio: new Date().toISOString(),
+                    cambiosDetectados: []
+                });
+                saveToStorage();
+                alert('Proceso agregado a monitoreo');
+            }
+        }
+
+        // ========== PALABRAS CLAVE ==========
+        function renderPalabrasClaveUI() {
+            const container = document.getElementById('listaPalabrasClaveUI');
+            const palabras = appState.palabrasClaves.filter(p => p.activa);
+
+            container.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px;">
+                    ${palabras.map(p => `
+                        <div style="background: var(--light); padding: 15px; border-radius: 6px; border-left: 4px solid var(--primary); display: flex; justify-content: space-between; align-items: center;">
+                            <span>${p.palabra}</span>
+                            <div style="display: flex; gap: 5px;">
+                                <button class="btn btn-secondary btn-small" onclick="openModalPalabraClave('${p.id}')">✏️</button>
+                                <button class="btn btn-danger btn-small" onclick="eliminarPalabraClave('${p.id}')">🗑️</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function openModalPalabraClave(id = null) {
+            const modal = document.getElementById('modalPalabraClave');
+            if (id) {
+                const palabra = appState.palabrasClaves.find(p => p.id === id);
+                if (palabra) {
+                    document.getElementById('palabraClaveInput').value = palabra.palabra;
+                    document.getElementById('palabraClaveActiva').checked = palabra.activa;
+                    modal.dataset.id = id;
+                }
+            } else {
+                document.getElementById('palabraClaveInput').value = '';
+                document.getElementById('palabraClaveActiva').checked = true;
+                delete modal.dataset.id;
+            }
+            modal.classList.add('active');
+        }
+
+        function guardarPalabraClave() {
+            const id = document.getElementById('modalPalabraClave').dataset.id;
+            const palabra = document.getElementById('palabraClaveInput').value.trim();
+            const activa = document.getElementById('palabraClaveActiva').checked;
+
+            if (!palabra) {
+                alert('Por favor ingresa una palabra clave');
+                return;
+            }
+
+            if (id) {
+                const idx = appState.palabrasClaves.findIndex(p => p.id === id);
+                if (idx !== -1) {
+                    appState.palabrasClaves[idx].palabra = palabra;
+                    appState.palabrasClaves[idx].activa = activa;
+                }
+            } else {
+                appState.palabrasClaves.push({
+                    id: Date.now() + Math.random(),
+                    palabra: palabra,
+                    activa: activa,
+                    fechaAgregada: new Date().toISOString()
+                });
+            }
+
+            saveToStorage();
+            closeModal('modalPalabraClave');
+            renderPalabrasClaveUI();
+        }
+
+        function eliminarPalabraClave(id) {
+            if (confirm('¿Eliminar esta palabra clave?')) {
+                appState.palabrasClaves = appState.palabrasClaves.filter(p => p.id !== id);
+                saveToStorage();
+                renderPalabrasClaveUI();
+            }
+        }
+
+        // ========== BÚSQUEDA MANUAL ==========
+        function busquedaManual() {
+            const palabra = document.getElementById('palabraClaveManual').value.trim();
+            const presupuestoMin = parseInt(document.getElementById('presupuestoMinManual').value);
+            const presupuestoMax = parseInt(document.getElementById('presupuestoMaxManual').value);
+            const afinidadMin = parseInt(document.getElementById('afinidadMinManual').value);
+
+            if (!palabra) {
+                alert('Por favor ingresa una palabra clave');
+                return;
+            }
+
+            // Simulación de búsqueda
+            const resultados = [
+                {
+                    numero: 'SECOP-2026-001',
+                    entidad: 'Ministerio de Educación',
+                    objeto: 'Desarrollo de plataforma LMS para educación virtual',
+                    presupuesto: 500000000,
+                    afinidad: 95,
+                    fechaPublicacion: new Date().toISOString().split('T')[0],
+                    fechaCierre: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+                },
+                {
+                    numero: 'SECOP-2026-002',
+                    entidad: 'Gobernación de Cundinamarca',
+                    objeto: 'Diseño instruccional y producción de contenidos digitales',
+                    presupuesto: 300000000,
+                    afinidad: 88,
+                    fechaPublicacion: new Date().toISOString().split('T')[0],
+                    fechaCierre: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+                }
+            ];
+
+            const resultadosFiltrados = resultados.filter(r =>
+                r.presupuesto >= presupuestoMin &&
+                r.presupuesto <= presupuestoMax &&
+                r.afinidad >= afinidadMin
+            );
+
+            mostrarResultados(resultadosFiltrados);
+
+            // Registrar en historial
+            appState.historialBusquedas.push({
+                fecha: new Date().toISOString(),
+                palabra: palabra,
+                totalResultados: resultados.length,
+                relevantes: resultadosFiltrados.length
+            });
+            saveToStorage();
+        }
+
+        function mostrarResultados(resultados) {
+            const container = document.getElementById('contenidoResultados');
+            const resultadosDiv = document.getElementById('resultadosBusqueda');
+
+            if (resultados.length === 0) {
+                container.innerHTML = '<p class="text-center">No se encontraron procesos que coincidan con los filtros.</p>';
+            } else {
+                container.innerHTML = `
+                    <p style="margin-bottom: 20px;"><strong>Se encontraron ${resultados.length} procesos relevantes:</strong></p>
+                    ${resultados.map(r => `
+                        <div style="border: 1px solid var(--border); padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                            <h3 style="color: var(--primary); margin-bottom: 10px;">${r.numero}</h3>
+                            <p><strong>Entidad:</strong> ${r.entidad}</p>
+                            <p><strong>Objeto:</strong> ${r.objeto}</p>
+                            <p><strong>Presupuesto:</strong> ${formatCurrency(r.presupuesto)}</p>
+                            <p><strong>Afinidad:</strong> <span class="badge badge-primary">${r.afinidad}%</span></p>
+                            <p><strong>Cierre:</strong> ${r.fechaCierre}</p>
+                            <button class="btn btn-primary btn-small" onclick="agregarOportunidadDesdeResultado('${r.numero}', '${r.entidad}', '${r.objeto.replace(/'/g, "\\'")}', ${r.presupuesto}, ${r.afinidad}, '${r.fechaCierre}')">+ Agregar</button>
+                        </div>
+                    `).join('')}
+                `;
+            }
+
+            resultadosDiv.classList.remove('hidden');
+        }
+
+        function agregarOportunidadDesdeResultado(numero, entidad, objeto, presupuesto, afinidad, fechaCierre) {
+            appState.oportunidades.push({
+                id: Date.now().toString(),
+                numero: numero,
+                entidad: entidad,
+                objeto: objeto,
+                presupuesto: presupuesto,
+                afinidad: afinidad,
+                estado: 'Nueva',
+                fechaCierre: fechaCierre,
+                fechaRegistro: new Date().toISOString()
+            });
+            saveToStorage();
+            alert('Oportunidad agregada correctamente');
+            switchPage('oportunidades');
+        }
+
+        // ========== MONITOREO ==========
+        function renderMonitoreo() {
+            const container = document.getElementById('listaMonitoreo');
+
+            if (appState.monitoreo.length === 0) {
+                container.innerHTML = '<p class="text-center" style="padding: 20px;">Sin procesos en seguimiento</p>';
+                return;
+            }
+
+            container.innerHTML = appState.monitoreo.map(m => `
+                <div style="border: 1px solid var(--border); border-left: 4px solid var(--secondary); padding: 15px; border-radius: 6px; margin-bottom: 15px;">
+                    <h3 style="color: var(--primary); margin-bottom: 10px;">${m.numero}</h3>
+                    <p><strong>Entidad:</strong> ${m.entidad}</p>
+                    <p><strong>Presupuesto:</strong> ${formatCurrency(m.presupuesto)}</p>
+                    <p><strong>Cierre:</strong> ${m.fechaCierre}</p>
+                    <p><strong>Cambios detectados:</strong> ${m.cambiosDetectados.length}</p>
+                    <button class="btn btn-secondary btn-small" onclick="removerDelMonitoreo('${m.id}')">Remover</button>
+                </div>
+            `).join('');
+        }
+
+        function removerDelMonitoreo(id) {
+            appState.monitoreo = appState.monitoreo.filter(m => m.id !== id);
+            saveToStorage();
+            renderMonitoreo();
+        }
+
+        // ========== HISTORIAL ==========
+        function renderHistorial() {
+            renderHistorialBusquedas();
+            renderHistorialCambios();
+        }
+
+        function renderHistorialBusquedas() {
+            const tbody = document.getElementById('tablaHistorialBusquedas');
+            if (appState.historialBusquedas.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">Sin historial de búsquedas</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = appState.historialBusquedas.slice().reverse().map(h => `
+                <tr>
+                    <td>${new Date(h.fecha).toLocaleDateString()}</td>
+                    <td>${h.palabra}</td>
+                    <td>${h.totalResultados}</td>
+                    <td><span class="badge badge-success">${h.relevantes}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function renderHistorialCambios() {
+            const tbody = document.getElementById('tablaHistorialCambios');
+            if (appState.historialCambios.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center">Sin cambios detectados</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = appState.historialCambios.slice().reverse().map(h => `
+                <tr>
+                    <td>${new Date(h.fecha).toLocaleDateString()}</td>
+                    <td>${h.numeroProceso}</td>
+                    <td>${h.tipoCambio}</td>
+                    <td>${h.descripcion}</td>
+                </tr>
+            `).join('');
+        }
+
+        // ========== CONFIGURACIÓN ==========
+        function loadConfiguracion() {
+            document.getElementById('configPresupuestoMin').value = appState.config.presupuestoMin;
+            document.getElementById('configPresupuestoMax').value = appState.config.presupuestoMax;
+            document.getElementById('configAfinidadMin').value = appState.config.afinidadMin;
+            document.getElementById('configFrecuencia').value = appState.config.frecuencia;
+            document.getElementById('configHoraNotificacion').value = appState.config.horaNotificacion;
+            document.getElementById('configCorreoNotificacion').value = appState.config.correoNotificacion;
+            document.getElementById('configNotificacionesActivas').checked = appState.config.notificacionesActivas;
+        }
+
+        function guardarConfiguracion() {
+            appState.config.presupuestoMin = parseInt(document.getElementById('configPresupuestoMin').value);
+            appState.config.presupuestoMax = parseInt(document.getElementById('configPresupuestoMax').value);
+            appState.config.afinidadMin = parseInt(document.getElementById('configAfinidadMin').value);
+            appState.config.frecuencia = parseInt(document.getElementById('configFrecuencia').value);
+            appState.config.horaNotificacion = document.getElementById('configHoraNotificacion').value;
+            appState.config.correoNotificacion = document.getElementById('configCorreoNotificacion').value;
+            appState.config.notificacionesActivas = document.getElementById('configNotificacionesActivas').checked;
+
+            saveToStorage();
+            alert('Configuración guardada correctamente');
+        }
+
+        // ========== BUSQUEDA AUTOMATICA ==========
+        function executeSearch() {
+            alert('La búsqueda automática se ejecutará cada ' + appState.config.frecuencia + ' horas en el servidor. Esta es una funcionalidad que se implementará en Netlify Functions.');
+        }
+
+        // ========== MODALS ==========
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('active');
+                }
+            });
+        });
+
+        // ========== UTILITIES ==========
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('es-CO', {
+                style: 'currency',
+                currency: 'COP',
+                minimumFractionDigits: 0
+            }).format(value);
+        }
+
+// ========== INTEGRACIÓN SECOP II CON CAPTCHA ==========
+
+/**
+ * Abre el modal para resolver CAPTCHA y hacer búsqueda real
+ */
+function abrirModalCaptchaSecop() {
+    const modal = document.getElementById('modalCaptchaSecop');
+    const btnContinuar = document.getElementById('btnContinuarBusqueda');
+    
+    // Resetear estado
+    btnContinuar.disabled = true;
+    btnContinuar.innerHTML = '✓ Continuar con Búsqueda';
+    document.getElementById('secopBuscaStatus').style.display = 'none';
+    
+    // Abrir modal
+    modal.classList.add('active');
+    
+    // Obtener sesión inicial
+    obtenerSecionSecopInicial();
+}
+
+/**
+ * Obtiene sesión inicial de SECOP II
+ */
+async function obtenerSecionSecopInicial() {
+    try {
+        console.log('📡 Obteniendo sesión SECOP II...');
+        
+        const response = await fetch('/.netlify/functions/getSecopSession', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        });
+
+        const data = await response.json();
+
+        if (data.exito) {
+            console.log('✅ Sesión SECOP obtenida');
+            localStorage.setItem('secopSessionCookie', data.sessionCookie);
+            localStorage.setItem('secopSessionTime', new Date().toISOString());
+            
+            // El iframe ya está cargando SECOP II
+            // El usuario puede resolver el CAPTCHA
+            habilitarBotonContinuar();
+        } else {
+            console.error('Error:', data.error);
+            alert('Error obteniendo sesión SECOP II: ' + data.error);
+        }
+
+    } catch (error) {
+        console.error('Error en obtenerSecionSecopInicial:', error);
+        alert('Error: ' + error.message);
+    }
+}
+
+/**
+ * Habilita el botón "Continuar" después de que usuario resuelva CAPTCHA
+ */
+function habilitarBotonContinuar() {
+    // Esperar un poco y luego mostrar mensaje
+    setTimeout(() => {
+        const btnContinuar = document.getElementById('btnContinuarBusqueda');
+        btnContinuar.disabled = false;
+        btnContinuar.innerHTML = '✓ Continuar con Búsqueda';
+        
+        document.getElementById('secopBuscaStatus').style.display = 'none';
+    }, 3000);
+}
+
+/**
+ * Continúa con la búsqueda después de resolver CAPTCHA
+ */
+async function continuarDespuesCaptchaSecop() {
+    const palabra = document.getElementById('palabraClaveManual').value.trim();
+    
+    if (!palabra) {
+        alert('Por favor ingresa una palabra clave');
+        return;
+    }
+
+    try {
+        // Cerrar modal
+        closeModal('modalCaptchaSecop');
+        
+        // Obtener sesión
+        const sessionCookie = localStorage.getItem('secopSessionCookie');
+        const presupuestoMin = parseInt(document.getElementById('presupuestoMinManual').value);
+        const presupuestoMax = parseInt(document.getElementById('presupuestoMaxManual').value);
+        
+        // Mostrar loading
+        const container = document.getElementById('contenidoResultados');
+        const resultadosDiv = document.getElementById('resultadosBusqueda');
+        container.innerHTML = '<div class="text-center" style="padding: 40px;"><span class="spinner">⟳</span> Buscando en SECOP II...<br><small style="color: #666; margin-top: 10px;">Esta búsqueda puede tardar 10-30 segundos</small></div>';
+        resultadosDiv.classList.remove('hidden');
+        
+        console.log('🔍 Iniciando búsqueda real en SECOP II...');
+        
+        // Llamar función serverless
+        const response = await fetch('/.netlify/functions/secopSearchWithCookie', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                palabraClave: palabra,
+                sessionCookie: sessionCookie,
+                presupuestoMin: presupuestoMin,
+                presupuestoMax: presupuestoMax
+            })
+        });
+
+        const data = await response.json();
+        
+        if (data.exito) {
+            console.log(`✅ Búsqueda completada: ${data.procesos.length} procesos encontrados`);
+            mostrarResultadosSecopReales(data.procesos);
+            
+            // Registrar en historial
+            appState.historialBusquedas.push({
+                fecha: new Date().toISOString(),
+                palabra: palabra,
+                totalResultados: data.procesos.length,
+                relevantes: data.procesos.length,
+                fuente: 'SECOP II Real'
+            });
+            saveToStorage();
+        } else {
+            throw new Error(data.error || 'Error desconocido');
+        }
+        
+    } catch (error) {
+        console.error('Error en búsqueda:', error);
+        const container = document.getElementById('contenidoResultados');
+        container.innerHTML = `
+            <div class="alert alert-danger">
+                <strong>❌ Error en búsqueda SECOP II:</strong><br>
+                ${error.message}<br>
+                <br>
+                <small>Soluciones:</small>
+                <ul style="margin: 5px 0 0 20px; font-size: 12px;">
+                    <li>Verifica tu conexión a internet</li>
+                    <li>Intenta de nuevo en unos segundos</li>
+                    <li>Si persiste, usa búsqueda simulada</li>
+                </ul>
+            </div>
+        `;
+    }
+}
+
+/**
+ * Muestra resultados reales de SECOP II
+ */
+function mostrarResultadosSecopReales(procesos) {
+    const container = document.getElementById('contenidoResultados');
+    const resultadosDiv = document.getElementById('resultadosBusqueda');
+
+    if (procesos.length === 0) {
+        container.innerHTML = `
+            <div class="alert alert-warning">
+                ⚠️ No se encontraron procesos en SECOP II con esos filtros.
+            </div>
+        `;
+        return;
+    }
+
+    // Renderizar resultados
+    container.innerHTML = `
+        <div class="alert alert-success" style="margin-bottom: 20px;">
+            ✅ <strong>${procesos.length} procesos encontrados en SECOP II</strong>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr; gap: 15px;">
+            ${procesos.map((p, idx) => `
+                <div style="border: 1px solid var(--border); padding: 20px; border-radius: 6px; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                        <div>
+                            <h3 style="color: var(--primary); margin: 0 0 5px 0; font-size: 16px;">
+                                ${p.numero}
+                            </h3>
+                            <p style="color: #666; margin: 0; font-size: 13px;">
+                                ${p.entidad}
+                            </p>
+                        </div>
+                        <span class="badge badge-success">SECOP Real</span>
+                    </div>
+                    
+                    <p style="margin: 10px 0; color: #333; line-height: 1.4;">
+                        <strong>Objeto:</strong> ${p.objeto}
+                    </p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 12px 0;">
+                        <div>
+                            <small style="color: #999;">Presupuesto</small><br>
+                            <strong style="font-size: 14px; color: var(--success);">
+                                ${formatCurrency(p.presupuesto)}
+                            </strong>
+                        </div>
+                        <div>
+                            <small style="color: #999;">Fecha Cierre</small><br>
+                            <strong style="font-size: 14px;">
+                                ${p.fechaCierre || 'No especificada'}
+                            </strong>
+                        </div>
+                        <div>
+                            <small style="color: #999;">Afinidad</small><br>
+                            <strong style="font-size: 14px;">
+                                <span class="badge badge-primary">${p.afinidad || 75}%</span>
+                            </strong>
+                        </div>
+                        <div>
+                            <small style="color: #999;">Tipo</small><br>
+                            <strong style="font-size: 14px;">
+                                ${p.tipoContrato || 'Servicio'}
+                            </strong>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap;">
+                        <a href="${p.enlaceSECOP}" target="_blank" rel="noopener noreferrer" class="btn btn-secondary btn-small">
+                            🔗 Ver en SECOP
+                        </a>
+                        <button 
+                            class="btn btn-primary btn-small"
+                            onclick="agregarOportunidadDesdeResultado('${p.numero.replace(/'/g, "\\'")}', '${p.entidad.replace(/'/g, "\\'")}', '${p.objeto.replace(/'/g, "\\'")}', ${p.presupuesto}, ${p.afinidad || 75}, '${p.fechaCierre || ''}')">
+                            ➕ Agregar a Oportunidades
+                        </button>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+
+    resultadosDiv.classList.remove('hidden');
+}
+
+/**
+ * Modificar la función busquedaManual para que pregunta si usar datos reales
+ */
+function busquedaManualModificada() {
+    const palabra = document.getElementById('palabraClaveManual').value.trim();
+    
+    if (!palabra) {
+        alert('Por favor ingresa una palabra clave');
+        return;
+    }
+
+    // Mostrar diálogo de opción
+    const resultado = confirm(
+        '¿Deseas buscar datos REALES de SECOP II?\n\n' +
+        '✓ Datos Reales (requiere resolver CAPTCHA, más lento)\n' +
+        '✗ Datos Simulados (rápido, para pruebas)\n\n' +
+        'Haz clic en ✓ para datos reales o ✗ para simulados'
+    );
+
+    if (resultado) {
+        // Usuario eligió datos reales
+        abrirModalCaptchaSecop();
+    } else {
+        // Usuario eligió datos simulados
+        busquedaManualSimulada();
+    }
+}
+
+/**
+ * Búsqueda simulada (la función existente)
+ */
+function busquedaManualSimulada() {
+    const palabra = document.getElementById('palabraClaveManual').value.trim();
+    const presupuestoMin = parseInt(document.getElementById('presupuestoMinManual').value);
+    const presupuestoMax = parseInt(document.getElementById('presupuestoMaxManual').value);
+    const afinidadMin = parseInt(document.getElementById('afinidadMinManual').value);
+
+    if (!palabra) {
+        alert('Por favor ingresa una palabra clave');
+        return;
+    }
+
+    // Simulación de búsqueda (datos simulados)
+    const resultados = [
+        {
+            numero: 'SECOP-2024-001',
+            entidad: 'Ministerio de Educación',
+            objeto: 'Desarrollo de plataforma LMS para educación virtual',
+            presupuesto: 500000000,
+            afinidad: 95,
+            fechaPublicacion: new Date().toISOString().split('T')[0],
+            fechaCierre: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        },
+        {
+            numero: 'SECOP-2024-002',
+            entidad: 'Gobernación de Cundinamarca',
+            objeto: 'Diseño instruccional y producción de contenidos digitales para capacitación',
+            presupuesto: 300000000,
+            afinidad: 88,
+            fechaPublicacion: new Date().toISOString().split('T')[0],
+            fechaCierre: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+        }
+    ];
+
+    const resultadosFiltrados = resultados.filter(r =>
+        r.presupuesto >= presupuestoMin &&
+        r.presupuesto <= presupuestoMax &&
+        r.afinidad >= afinidadMin
+    );
+
+    mostrarResultados(resultadosFiltrados);
+
+    // Registrar en historial
+    appState.historialBusquedas.push({
+        fecha: new Date().toISOString(),
+        palabra: palabra,
+        totalResultados: resultados.length,
+        relevantes: resultadosFiltrados.length,
+        fuente: 'Simulada'
+    });
+    saveToStorage();
+}
+    </script>
+
+<!-- Modal CAPTCHA SECOP II -->
+<div id="modalCaptchaSecop" class="modal">
+    <div class="modal-content" style="max-width: 800px; max-height: 90vh;">
+        <div class="modal-header">
+            <h2>🔐 Verificación SECOP II</h2>
+            <button class="close-btn" onclick="closeModal('modalCaptchaSecop')">&times;</button>
+        </div>
+
+        <!-- Instrucciones -->
+        <div class="alert alert-info" style="margin-bottom: 20px;">
+            <strong>📋 Instrucciones:</strong>
+            <ol style="margin: 10px 0 0 20px;">
+                <li>Resuelve el CAPTCHA en la ventana de abajo</li>
+                <li>Haz clic en el botón de búsqueda de SECOP</li>
+                <li>Espera a que aparezcan los resultados</li>
+                <li>Haz clic en "Continuar con Búsqueda"</li>
+            </ol>
+        </div>
+
+        <!-- iframe con SECOP II -->
+        <div style="border: 2px solid var(--border); border-radius: 6px; overflow: hidden; margin-bottom: 20px; background: white;">
+            <iframe 
+                id="secopCaptchaFrame" 
+                src="https://www.secop.gov.co/CO1Marketplace/Consulta/DoBuscar.aspx" 
+                style="width: 100%; height: 650px; border: none; display: block;"
+                title="SECOP II - Resolver CAPTCHA">
+            </iframe>
+        </div>
+
+        <!-- Estado de la búsqueda -->
+        <div id="secopBuscaStatus" class="alert alert-warning" style="display: none; margin-bottom: 20px;">
+            <span class="spinner">⟳</span> Esperando resolución de CAPTCHA...
+        </div>
+
+        <!-- Botones de acción -->
+        <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button 
+                class="btn btn-secondary" 
+                onclick="closeModal('modalCaptchaSecop')">
+                ✕ Cancelar
+            </button>
+            <button 
+                class="btn btn-primary" 
+                id="btnContinuarBusqueda"
+                onclick="continuarDespuesCaptchaSecop()"
+                disabled>
+                ✓ Continuar con Búsqueda
+            </button>
+        </div>
+
+        <!-- Ayuda -->
+        <div style="margin-top: 20px; padding: 15px; background: #f0f0f0; border-radius: 6px; font-size: 12px; color: #666;">
+            <strong>💡 Ayuda:</strong>
+            <ul style="margin: 8px 0 0 20px;">
+                <li>Si el CAPTCHA tarda en cargar, recarga la página</li>
+                <li>Debes tener cookies habilitadas en el navegador</li>
+                <li>Si persisten los problemas, usa búsqueda simulada</li>
+                <li>Contacta a soporte si el problema continúa</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
